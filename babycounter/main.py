@@ -8,9 +8,11 @@ from rich import box
 from rich.table import Table
 import asyncio
 
+
 def initialize_genius(verbose):
     load_dotenv()
     return lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
+
 
 async def fetch_top_songs(genius, artist_name, max_songs=10):
     try:
@@ -19,6 +21,7 @@ async def fetch_top_songs(genius, artist_name, max_songs=10):
     except Exception as e:
         print(f"Error fetching top songs: {e}")
         return []
+
 
 async def count_babies(genius, song_title, artist_name):
     try:
@@ -30,7 +33,8 @@ async def count_babies(genius, song_title, artist_name):
         print(f"Error fetching song lyrics: {e}")
     return 0
 
-async def main():
+
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Count occurrences of a word in an artist's songs."
     )
@@ -57,11 +61,15 @@ async def main():
         action="store_true",
         help="Enable verbose output",
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+async def main(args):
 
     console = Console()
     genius = initialize_genius(args.verbose)
-    console.print(f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]")
+    console.print(
+        f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]"
+    )
     songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
     console.print(f"[bold green]Fetched {len(songs)} songs.[/bold green]")
 
@@ -77,7 +85,9 @@ async def main():
         return baby_counts
 
     baby_counts = await count_all_babies()
-    baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
+    baby_counts_sorted = sorted(
+        baby_counts.items(), key=lambda item: item[1], reverse=True
+    )
 
     table = Table(title="Occurrences of 'baby' in Songs", box=box.ROUNDED)
     table.add_column("Song", style="cyan", no_wrap=True)
@@ -88,5 +98,7 @@ async def main():
 
     console.print(table)
 
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    args = parse_args()
+    asyncio.run(main(args))

@@ -9,19 +9,12 @@ genius = lyricsgenius.Genius(
     os.getenv("GENIUS_API_KEY")
 )  # , verbose=False, remove_section_headers=True)
 
-# List of Janet Jackson's top songs
-songs = [
-    "All For You",
-    "Together Again",
-    "That's the Way Love Goes",
-    "Nasty",
-    "Rhythm Nation",
-    "Escapade",
-    "If",
-    "Again",
-    "Love Will Never Do (Without You)",
-    "Feedback",
-]
+# Fetch the top 100 Janet Jackson songs
+def fetch_top_songs(artist_name, max_songs=100):
+    artist = genius.search_artist(artist_name, max_songs=max_songs)
+    return [song.title for song in artist.songs]
+
+songs = fetch_top_songs("Janet Jackson")
 
 
 # Function to count occurrences of "baby"
@@ -33,9 +26,10 @@ def count_babies(song_title):
     return 0
 
 
-# Count "baby" in each song
-baby_counts = {song: count_babies(song) for song in songs}
-baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
+if __name__ == "__main__":
+    # Count "baby" in each song
+    baby_counts = {song: count_babies(song) for song in songs}
+    baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
 
-for song, count in baby_counts_sorted:
-    print(f"{song}: {count} times")
+    for song, count in baby_counts_sorted:
+        print(f"{song}: {count} times")

@@ -1,4 +1,5 @@
 import os
+import argparse
 import lyricsgenius
 from dotenv import load_dotenv
 
@@ -13,7 +14,12 @@ def fetch_top_songs(artist_name, max_songs=100):
     return [song.title for song in artist.songs]
 
 
-songs = fetch_top_songs("Janet Jackson")
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Count occurrences of 'baby' in Janet Jackson's songs.")
+parser.add_argument('--max_songs', type=int, default=10, help='Number of top songs to fetch (default: 10)')
+args = parser.parse_args()
+
+songs = fetch_top_songs("Janet Jackson", max_songs=args.max_songs)
 
 
 # Function to count occurrences of "baby"
@@ -28,9 +34,7 @@ def count_babies(song_title):
 if __name__ == "__main__":
     # Count "baby" in each song
     baby_counts = {song: count_babies(song) for song in songs}
-    baby_counts_sorted = sorted(
-        baby_counts.items(), key=lambda item: item[1], reverse=True
-    )
+    baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
 
     for song, count in baby_counts_sorted:
         print(f"{song}: {count} times")

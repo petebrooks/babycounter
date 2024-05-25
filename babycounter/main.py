@@ -14,9 +14,11 @@ def initialize_genius(verbose):
     return lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
 
 
-async def fetch_top_songs(genius, artist_name, max_songs=10):
+async def fetch_top_songs(genius, artist_name, max_songs=10, progress=None):
     try:
-        artist = genius.search_artist(artist_name, max_songs=max_songs)
+        artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs)
+        if progress:
+            progress.update(task, advance=1)
         return [song.title for song in artist.songs]
     except Exception as e:
         print(f"Error fetching top songs: {e}")
@@ -70,7 +72,9 @@ async def main(args):
     console.print(
         f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]"
     )
-    songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Fetching top songs...", total=1)
+        songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs, progress=progress)
     console.print(f"[bold green]Fetched {len(songs)} songs.[/bold green]")
 
     async def count_all_babies():

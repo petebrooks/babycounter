@@ -45,13 +45,13 @@ def parse_args():
         help="Artist name (default: Janet Jackson)",
     )
     parser.add_argument(
-        "--max_songs",
+        "--max-songs",
         type=int,
         default=10,
         help="Number of top songs to fetch (default: 10)",
     )
     parser.add_argument(
-        "--search_term",
+        "--search-term",
         type=str,
         default="baby",
         help="Word to search for in lyrics (default: baby)",

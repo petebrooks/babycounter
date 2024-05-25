@@ -18,7 +18,10 @@ def initialize_genius(verbose):
 async def fetch_top_songs(genius, artist_name, max_songs=10, progress=None):
     try:
         artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False, text_format='plain')
-        return [song.title for song in artist.songs]
+        if artist:
+            return [song.title for song in artist.songs]
+        else:
+            return []
     except Exception as e:
         print(f"Error fetching top songs: {e}")
         return []
@@ -74,6 +77,9 @@ async def main(args):
     start_time = time.time()
     with Progress() as progress:
         songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+    if not songs:
+        console.print(f"[bold red]Error: No songs fetched for {args.artist}. Exiting...[/bold red]")
+        return 1
     end_time = time.time()
     if args.verbose:
         console.print(f"[bold green]Fetched {len(songs)} songs in {end_time - start_time:.2f} seconds.[/bold green]")
@@ -118,6 +124,8 @@ async def main(args):
 if __name__ == "__main__":
     try:
         args = parse_args()
-        asyncio.run(main(args))
+        exit_code = asyncio.run(main(args))
+        if exit_code is not None:
+            exit(exit_code)
     except KeyboardInterrupt:
         print("\nProcess interrupted. Exiting gracefully...")

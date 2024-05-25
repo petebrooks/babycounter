@@ -17,7 +17,7 @@ def initialize_genius(verbose):
 
 async def fetch_top_songs(genius, artist_name, max_songs=10, progress=None):
     try:
-        artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False)
+        artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False, text_format='plain')
         return [song.title for song in artist.songs]
     except Exception as e:
         print(f"Error fetching top songs: {e}")

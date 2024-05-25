@@ -6,6 +6,7 @@ authors = ["petelouise <programmetress@petelouise.beauty>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+rich = "^10.0.0"
 python = "^3.12"
 lyricsgenius = "^3.0.1"
 python-dotenv = "^1.0.1"

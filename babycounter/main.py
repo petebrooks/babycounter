@@ -2,6 +2,10 @@ import os
 import argparse
 import lyricsgenius
 from dotenv import load_dotenv
+from rich.console import Console
+from rich.progress import Progress
+from rich import box
+from rich.table import Table
 
 def initialize_genius(verbose):
     load_dotenv()
@@ -54,14 +58,28 @@ def main():
     )
     args = parser.parse_args()
 
+    console = Console()
     genius = initialize_genius(args.verbose)
+    console.print(f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]")
     songs = fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+    console.print(f"[bold green]Fetched {len(songs)} songs.[/bold green]")
 
-    baby_counts = {song: count_babies(genius, song, args.artist) for song in songs}
+    baby_counts = {}
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Counting occurrences...", total=len(songs))
+        for song in songs:
+            baby_counts[song] = count_babies(genius, song, args.artist)
+            progress.advance(task)
     baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
 
+    table = Table(title="Occurrences of 'baby' in Songs", box=box.ROUNDED)
+    table.add_column("Song", style="cyan", no_wrap=True)
+    table.add_column("Count", style="magenta")
+
     for song, count in baby_counts_sorted:
-        print(f"{song}: {count} times")
+        table.add_row(song, str(count))
+
+    console.print(table)
 
 if __name__ == "__main__":
     main()

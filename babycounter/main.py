@@ -1,14 +1,28 @@
+import os
 import lyricsgenius
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Replace 'YOUR_GENIUS_API_KEY' with your actual Genius API key
-genius = lyricsgenius.Genius("YOUR_GENIUS_API_KEY")
+genius = lyricsgenius.Genius(
+    os.getenv("GENIUS_API_KEY")
+)  # , verbose=False, remove_section_headers=True)
 
 # List of Janet Jackson's top songs
 songs = [
-    "All For You", "Together Again", "That's the Way Love Goes", 
-    "Nasty", "Rhythm Nation", "Escapade", "If", "Again", 
-    "Love Will Never Do (Without You)", "Feedback"
+    "All For You",
+    "Together Again",
+    "That's the Way Love Goes",
+    "Nasty",
+    "Rhythm Nation",
+    "Escapade",
+    "If",
+    "Again",
+    "Love Will Never Do (Without You)",
+    "Feedback",
 ]
+
 
 # Function to count occurrences of "baby"
 def count_babies(song_title):
@@ -17,6 +31,7 @@ def count_babies(song_title):
         lyrics = song.lyrics.lower()
         return lyrics.count("baby")
     return 0
+
 
 # Count "baby" in each song
 baby_counts = {song: count_babies(song) for song in songs}

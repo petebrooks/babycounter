@@ -30,7 +30,7 @@ async def count_babies(genius, song_title, artist_name):
         print(f"Error fetching song lyrics: {e}")
     return 0
 
-def main():
+async def main():
     parser = argparse.ArgumentParser(
         description="Count occurrences of a word in an artist's songs."
     )

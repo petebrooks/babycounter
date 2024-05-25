@@ -3,47 +3,65 @@ import argparse
 import lyricsgenius
 from dotenv import load_dotenv
 
-load_dotenv()
+def initialize_genius(verbose):
+    load_dotenv()
+    return lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
 
-genius = lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=True)
+def fetch_top_songs(genius, artist_name, max_songs=10):
+    try:
+        artist = genius.search_artist(artist_name, max_songs=max_songs)
+        return [song.title for song in artist.songs]
+    except Exception as e:
+        print(f"Error fetching top songs: {e}")
+        return []
 
-
-# Fetch the top 100 Janet Jackson songs
-def fetch_top_songs(artist_name, max_songs=10):
-    artist = genius.search_artist(artist_name, max_songs=max_songs)
-    return [song.title for song in artist.songs]
-
-
-# Parse command-line arguments
-parser = argparse.ArgumentParser(
-    description="Count occurrences of 'baby' in Janet Jackson's songs."
-)
-parser.add_argument(
-    "--max_songs",
-    type=int,
-    default=10,
-    help="Number of top songs to fetch (default: 10)",
-)
-args = parser.parse_args()
-
-songs = fetch_top_songs("Janet Jackson", max_songs=args.max_songs)
-
-
-# Function to count occurrences of "baby"
-def count_babies(song_title):
-    song = genius.search_song(song_title, "Janet Jackson")
-    if song:
-        lyrics = song.lyrics.lower()
-        return lyrics.count("baby")
+def count_babies(genius, song_title, artist_name):
+    try:
+        song = genius.search_song(song_title, artist_name)
+        if song:
+            lyrics = song.lyrics.lower()
+            return lyrics.count("baby")
+    except Exception as e:
+        print(f"Error fetching song lyrics: {e}")
     return 0
 
-
-if __name__ == "__main__":
-    # Count "baby" in each song
-    baby_counts = {song: count_babies(song) for song in songs}
-    baby_counts_sorted = sorted(
-        baby_counts.items(), key=lambda item: item[1], reverse=True
+def main():
+    parser = argparse.ArgumentParser(
+        description="Count occurrences of a word in an artist's songs."
     )
+    parser.add_argument(
+        "--artist",
+        type=str,
+        default="Janet Jackson",
+        help="Artist name (default: Janet Jackson)",
+    )
+    parser.add_argument(
+        "--max_songs",
+        type=int,
+        default=10,
+        help="Number of top songs to fetch (default: 10)",
+    )
+    parser.add_argument(
+        "--search_term",
+        type=str,
+        default="baby",
+        help="Word to search for in lyrics (default: baby)",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output",
+    )
+    args = parser.parse_args()
+
+    genius = initialize_genius(args.verbose)
+    songs = fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+
+    baby_counts = {song: count_babies(genius, song, args.artist) for song in songs}
+    baby_counts_sorted = sorted(baby_counts.items(), key=lambda item: item[1], reverse=True)
 
     for song, count in baby_counts_sorted:
         print(f"{song}: {count} times")
+
+if __name__ == "__main__":
+    main()

@@ -7,6 +7,7 @@ from rich.progress import Progress
 from rich import box
 from rich.table import Table
 import asyncio
+import time
 
 
 def initialize_genius(verbose):
@@ -70,13 +71,27 @@ async def main(args):
     console.print(
         f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]"
     )
+    start_time = time.time()
     with Progress() as progress:
         songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+    end_time = time.time()
+    if args.verbose:
+        console.print(f"[bold green]Fetched {len(songs)} songs in {end_time - start_time:.2f} seconds.[/bold green]")
     console.print(f"[bold green]Fetched {len(songs)} songs.[/bold green]")
+    start_time = time.time()
 
     async def count_all_babies():
         baby_counts = {}
         with Progress() as progress:
+            task = progress.add_task("[cyan]Counting occurrences...", total=len(songs))
+            tasks = [count_babies(genius, song, args.artist) for song in songs]
+            for coro in asyncio.as_completed(tasks):
+                song, count = await coro
+                baby_counts[song] = count
+                progress.advance(task)
+        end_time = time.time()
+        if args.verbose:
+            console.print(f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]")
             task = progress.add_task("[cyan]Counting occurrences...", total=len(songs))
             tasks = [count_babies(genius, song, args.artist) for song in songs]
             for coro in asyncio.as_completed(tasks):

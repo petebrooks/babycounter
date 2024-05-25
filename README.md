@@ -1,6 +1,6 @@
-# BabyCounter
+# babycounter
 
-BabyCounter is a command-line tool that fetches the top songs of an artist from the Genius API and counts the occurrences of a specified word in the lyrics.
+babycounter is a command-line tool that fetches the top songs of an artist from the Genius API and counts the occurrences of a specified word in the lyrics.
 
 ## Usage
 
@@ -18,5 +18,5 @@ python -m babycounter.main [--artist ARTIST_NAME] [--max_songs MAX_SONGS] [--sea
 ### Example
 
 ```sh
-python -m babycounter.main --artist "Janet Jackson" --max_songs 20 --search_term "love" --verbose
+python -m babycounter.main --artist "So Inagawa" --max_songs 20 --search_term "deep" --verbose
 ```

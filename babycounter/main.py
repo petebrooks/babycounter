@@ -35,7 +35,7 @@ async def count_babies(genius, song_title, artist_name):
             return song_title, lyrics.count("baby")
     except Exception as e:
         print(f"Error fetching song lyrics: {e}")
-    return 0
+    return song_title, 0
 
 
 def parse_args():
@@ -89,12 +89,6 @@ async def main(args):
     async def count_all_babies():
         baby_counts = {}
         with Progress() as progress:
-            task = progress.add_task("[cyan]Counting occurrences...", total=len(songs))
-            tasks = [count_babies(genius, song, args.artist) for song in songs]
-            for coro in asyncio.as_completed(tasks):
-                song, count = await coro
-                baby_counts[song] = count
-                progress.advance(task)
         end_time = time.time()
         if args.verbose:
             console.print(f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]")

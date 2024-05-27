@@ -13,9 +13,6 @@ import time
 def initialize_genius(verbose):
     load_dotenv()
     genius = lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
-    # Set a default encoding if not provided by the API response
-    if not genius.response.encoding:
-        genius.response.encoding = 'utf-8'
     return genius
 
 

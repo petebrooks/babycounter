@@ -15,7 +15,7 @@ def initialize_genius(verbose):
     return lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
 
 
-async def fetch_top_songs(genius, artist_name, max_songs=10, progress=None):
+async def fetch_top_songs(genius, artist_name, max_songs=10):
     try:
         artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False)
         if artist:
@@ -75,8 +75,7 @@ async def main(args):
         f"[bold green]Fetching top {args.max_songs} songs for {args.artist}...[/bold green]"
     )
     start_time = time.time()
-    with Progress() as progress:
-        songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
+    songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
     if not songs:
         console.print(f"[bold red]Error: No songs fetched for {args.artist}. Exiting...[/bold red]")
         return 1

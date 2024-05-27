@@ -12,7 +12,11 @@ import time
 
 def initialize_genius(verbose):
     load_dotenv()
-    return lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
+    genius = lyricsgenius.Genius(os.getenv("GENIUS_API_KEY"), verbose=verbose)
+    # Set a default encoding if not provided by the API response
+    if not genius.response.encoding:
+        genius.response.encoding = 'utf-8'
+    return genius
 
 
 async def fetch_top_songs(genius, artist_name, max_songs=10):

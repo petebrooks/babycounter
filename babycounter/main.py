@@ -18,7 +18,9 @@ def initialize_genius(verbose):
 
 async def fetch_top_songs(genius, artist_name, max_songs=10):
     try:
-        artist = await asyncio.to_thread(genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False)
+        artist = await asyncio.to_thread(
+            genius.search_artist, artist_name, max_songs=max_songs, get_full_info=False
+        )
         if artist:
             return [song.title for song in artist.songs]
         else:
@@ -68,8 +70,8 @@ def parse_args():
     )
     return parser.parse_args()
 
-async def main(args):
 
+async def main(args):
     console = Console()
     genius = initialize_genius(args.verbose)
     console.print(
@@ -78,11 +80,15 @@ async def main(args):
     start_time = time.time()
     songs = await fetch_top_songs(genius, args.artist, max_songs=args.max_songs)
     if not songs:
-        console.print(f"[bold red]Error: No songs fetched for {args.artist}. Exiting...[/bold red]")
+        console.print(
+            f"[bold red]Error: No songs fetched for {args.artist}. Exiting...[/bold red]"
+        )
         return 1
     end_time = time.time()
     if args.verbose:
-        console.print(f"[bold green]Fetched {len(songs)} songs in {end_time - start_time:.2f} seconds.[/bold green]")
+        console.print(
+            f"[bold green]Fetched {len(songs)} songs in {end_time - start_time:.2f} seconds.[/bold green]"
+        )
     console.print(f"[bold green]Fetched {len(songs)} songs.[/bold green]")
     start_time = time.time()
 
@@ -97,7 +103,9 @@ async def main(args):
                 progress.advance(task)
         end_time = time.time()
         if args.verbose:
-            console.print(f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]")
+            console.print(
+                f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]"
+            )
         return baby_counts
 
     baby_counts = await count_all_babies()

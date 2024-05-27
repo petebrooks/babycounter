@@ -89,15 +89,15 @@ async def main(args):
     async def count_all_babies():
         baby_counts = {}
         with Progress() as progress:
-        end_time = time.time()
-        if args.verbose:
-            console.print(f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]")
             task = progress.add_task("[cyan]Counting occurrences...", total=len(songs))
             tasks = [count_babies(genius, song, args.artist) for song in songs]
             for coro in asyncio.as_completed(tasks):
                 song, count = await coro
                 baby_counts[song] = count
                 progress.advance(task)
+        end_time = time.time()
+        if args.verbose:
+            console.print(f"[bold green]Counted occurrences in {end_time - start_time:.2f} seconds.[/bold green]")
         return baby_counts
 
     baby_counts = await count_all_babies()
